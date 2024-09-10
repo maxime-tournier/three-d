@@ -240,6 +240,9 @@ impl Window {
                 Event::MainEventsCleared => {
                     self.window.request_redraw();
                 }
+                Event::UserEvent(()) => {
+                    self.window.request_redraw();
+                }
                 Event::RedrawRequested(_) => {
                     #[cfg(target_arch = "wasm32")]
                     if self.maximized || option_env!("THREE_D_SCREENSHOT").is_some() {
@@ -323,4 +326,5 @@ impl Window {
     pub fn gl(&self) -> Context {
         (*self.gl).clone()
     }
+
 }
