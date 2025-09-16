@@ -98,6 +98,7 @@ impl Sprites {
             viewer.viewport(),
             6,
             self.center_buffer.instance_count(),
+            self.mode(),
         )
     }
 }

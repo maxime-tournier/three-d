@@ -157,6 +157,13 @@ pub trait Geometry {
     /// The time parameter should be some continious time, for example the time since start.
     ///
     fn animate(&mut self, _time: f32) {}
+
+    ///
+    /// Draw mode for the geometry (defaults to `Mode::Triangles`)
+    ///
+    fn mode(&self) -> Mode {
+        Mode::default()
+    }
 }
 
 use std::ops::Deref;
@@ -265,6 +272,7 @@ struct BaseMesh {
     tangents: Option<VertexBuffer<Vec4>>,
     uvs: Option<VertexBuffer<Vec2>>,
     colors: Option<VertexBuffer<Vec4>>,
+    mode: Mode,
 }
 
 impl BaseMesh {
@@ -303,6 +311,7 @@ impl BaseMesh {
                     &data.iter().map(|c| c.to_linear_srgb()).collect::<Vec<_>>(),
                 )
             }),
+            mode: Mode::default(),
         }
     }
 
@@ -314,15 +323,16 @@ impl BaseMesh {
                 render_states,
                 viewer.viewport(),
                 self.positions.vertex_count(),
+                self.mode,
             ),
             IndexBuffer::U8(element_buffer) => {
-                program.draw_elements(render_states, viewer.viewport(), element_buffer)
+                program.draw_elements(render_states, viewer.viewport(), element_buffer, self.mode)
             }
             IndexBuffer::U16(element_buffer) => {
-                program.draw_elements(render_states, viewer.viewport(), element_buffer)
+                program.draw_elements(render_states, viewer.viewport(), element_buffer, self.mode)
             }
             IndexBuffer::U32(element_buffer) => {
-                program.draw_elements(render_states, viewer.viewport(), element_buffer)
+                program.draw_elements(render_states, viewer.viewport(), element_buffer, self.mode)
             }
         }
     }
@@ -342,24 +352,28 @@ impl BaseMesh {
                 viewer.viewport(),
                 self.positions.vertex_count(),
                 instance_count,
+                self.mode,
             ),
             IndexBuffer::U8(element_buffer) => program.draw_elements_instanced(
                 render_states,
                 viewer.viewport(),
                 element_buffer,
                 instance_count,
+                self.mode,
             ),
             IndexBuffer::U16(element_buffer) => program.draw_elements_instanced(
                 render_states,
                 viewer.viewport(),
                 element_buffer,
                 instance_count,
+                self.mode,
             ),
             IndexBuffer::U32(element_buffer) => program.draw_elements_instanced(
                 render_states,
                 viewer.viewport(),
                 element_buffer,
                 instance_count,
+                self.mode,
             ),
         }
     }

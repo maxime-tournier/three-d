@@ -70,9 +70,10 @@ pub(crate) fn full_screen_draw(
     program: &Program,
     render_states: RenderStates,
     viewport: Viewport,
+    mode: Mode,
 ) {
     unsafe { context.bind_vertex_array(Some(context.vao)) };
-    program.draw_arrays(render_states, viewport, 3);
+    program.draw_arrays(render_states, viewport, 3, mode);
 }
 
 pub(crate) fn full_screen_vertex_shader_source() -> &'static str {

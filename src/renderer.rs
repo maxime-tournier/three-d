@@ -508,6 +508,7 @@ pub fn apply_screen_material(
         program,
         material.render_states(),
         viewer.viewport(),
+        Mode::default(),
     );
 }
 
@@ -542,7 +543,7 @@ pub fn apply_screen_effect(
         }
     });
     effect.use_uniforms(program, &viewer, lights, color_texture, depth_texture);
-    full_screen_draw(context, program, effect.render_states(), viewer.viewport());
+    full_screen_draw(context, program, effect.render_states(), viewer.viewport(), Mode::default());
 }
 
 ///

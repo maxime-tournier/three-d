@@ -2,6 +2,31 @@ use crate::core::*;
 use std::collections::HashMap;
 use std::sync::RwLock;
 
+/// Describe draw mode for a shader program.
+#[derive(Clone, Copy, Debug)]
+pub enum Mode {
+    /// Use GL_LINES
+    Lines,
+
+    /// Use GL_TRIANGLES
+    Triangles
+}
+
+impl Into<u32> for Mode {
+    fn into(self) -> u32 {
+        match self {
+            Mode::Lines => crate::context::LINES, 
+            Mode::Triangles => crate::context::TRIANGLES,           
+        }
+    }
+}
+
+impl Default for Mode {
+    fn default() -> Self {
+        Self::Triangles
+    }
+}
+
 ///
 /// A shader program consisting of a programmable vertex shader followed by a programmable fragment shader.
 /// Functionality includes transferring per vertex data to the vertex shader (see the use_attribute functionality)
@@ -429,13 +454,13 @@ impl Program {
     /// Assumes that the data for the three vertices in a triangle is defined contiguous in each vertex buffer.
     /// If you want to use an [ElementBuffer], see [Program::draw_elements].
     ///
-    pub fn draw_arrays(&self, render_states: RenderStates, viewport: Viewport, count: u32) {
+    pub fn draw_arrays(&self, render_states: RenderStates, viewport: Viewport, count: u32, mode: Mode) {
         self.context.set_viewport(viewport);
         self.context.set_render_states(render_states);
         self.use_program();
         unsafe {
             self.context
-                .draw_arrays(crate::context::TRIANGLES, 0, count as i32);
+                .draw_arrays(mode.into(), 0, count as i32);
             for location in self.attributes.values() {
                 self.context.disable_vertex_attrib_array(*location);
             }
@@ -459,13 +484,14 @@ impl Program {
         viewport: Viewport,
         count: u32,
         instance_count: u32,
+        mode: Mode,
     ) {
         self.context.set_viewport(viewport);
         self.context.set_render_states(render_states);
         self.use_program();
         unsafe {
             self.context.draw_arrays_instanced(
-                crate::context::TRIANGLES,
+                mode.into(),
                 0,
                 count as i32,
                 instance_count as i32,
@@ -495,6 +521,7 @@ impl Program {
         render_states: RenderStates,
         viewport: Viewport,
         element_buffer: &ElementBuffer<T>,
+        mode: Mode,
     ) {
         self.draw_subset_of_elements(
             render_states,
@@ -502,6 +529,7 @@ impl Program {
             element_buffer,
             0,
             element_buffer.count(),
+            mode,
         )
     }
 
@@ -517,6 +545,7 @@ impl Program {
         element_buffer: &ElementBuffer<T>,
         first: u32,
         count: u32,
+        mode: Mode,
     ) {
         self.context.set_viewport(viewport);
         self.context.set_render_states(render_states);
@@ -524,7 +553,7 @@ impl Program {
         element_buffer.bind();
         unsafe {
             self.context.draw_elements(
-                crate::context::TRIANGLES,
+                mode.into(),
                 count as i32,
                 T::data_type(),
                 first as i32,
@@ -555,6 +584,7 @@ impl Program {
         viewport: Viewport,
         element_buffer: &ElementBuffer<T>,
         instance_count: u32,
+        mode: Mode,
     ) {
         self.draw_subset_of_elements_instanced(
             render_states,
@@ -563,6 +593,7 @@ impl Program {
             0,
             element_buffer.count(),
             instance_count,
+            mode,
         )
     }
 
@@ -578,6 +609,7 @@ impl Program {
         first: u32,
         count: u32,
         instance_count: u32,
+        mode: Mode,
     ) {
         self.context.set_viewport(viewport);
         self.context.set_render_states(render_states);
@@ -585,7 +617,7 @@ impl Program {
         element_buffer.bind();
         unsafe {
             self.context.draw_elements_instanced(
-                crate::context::TRIANGLES,
+                mode.into(),
                 count as i32,
                 T::data_type(),
                 first as i32,

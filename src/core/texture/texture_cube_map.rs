@@ -479,7 +479,7 @@ impl TextureCubeMap {
                         program.use_texture("equirectangularMap", &map);
                         program.use_uniform("direction", side.direction());
                         program.use_uniform("up", side.up());
-                        full_screen_draw(context, &program, RenderStates::default(), viewport);
+                        full_screen_draw(context, &program, RenderStates::default(), viewport, Mode::Triangles);
                         Ok(())
                     })
                     .unwrap();
